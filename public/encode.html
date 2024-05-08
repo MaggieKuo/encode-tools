@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測試工具包</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/morph/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.0/font/bootstrap-icons.css">
+    <style>
+        .transparent-button {
+            background-color: transparent; 
+            border: none;
+            box-shadow: none;
+            /* padding: 0; */
+        }
+        
+        .transparent-button:hover {
+            background-color: transparent; 
+            border: none;
+            box-shadow: none;
+            color: blue;  
+        }
+    </style>
+        
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-3">測試工具包</h2>
+
+        <!-- 頁籤導航 -->
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#encryptionTab">加密/解密</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#jsonTab">JSON 轉換</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#decodeJwtTab">解 Token</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#dmTab">dm</a>
+            </li>
+        </ul>
+
+        <!-- 頁籤內容 -->
+        <div class="tab-content">
+            <!-- 加密/解密頁籤 -->
+            <div id="encryptionTab" class="container tab-pane active"><br>
+                <div class="row">
+                    <!-- UUID 列 -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="uuid" class="form-label mt-4">UUID (TXNSEQ):</label>
+                            <div class="input-group">
+                                <input type="text" id="uuid" name="uuid" class="form-control">
+                                <button onclick="generateUUID()" class="btn btn-outline-secondary">產生 UUID</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Database 列 -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="database" class="form-label mt-4">Database:</label>
+                            <select id="database" class="form-control" onchange="updateDbType()">
+                                <option value="postgresql">PostgreSQL</option>
+                                <option value="mssql">Microsoft SQL Server</option>
+                                <option value="mysql">MySQL</option>
+                                <option value="bigquery">BigQuery</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="data" class="form-label mt-4">Data: (若為新增，則 connId 可省略)</label>
+                    <textarea id="data" name="data" class="form-control" rows="8">
+{
+    "connId": "", 
+    "dbType":"postgresql",
+    "connName":"0124_Maggie",
+    "isActivate":true,
+    "connInfo":"填入 JSON 格式的連線資訊"
+}
+                   </textarea>
+                </div>
+
+                <div class="mt-3">
+                    <button onclick="encrypt()" class="btn btn-primary">加密</button>
+                    <button onclick="decrypt()" class="btn btn-secondary">解密</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="result" class="form-label mt-4">Result:</label>
+                    <div class="input-group">
+                        <textarea id="result" name="result" class="form-control" rows="8" readonly></textarea>
+                        <div class="input-group-append">
+                            <button onclick="copyToClipboard('result')" class="btn transparent-button">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON 轉換頁籤 -->
+            <div id="jsonTab" class="container tab-pane fade"><br>
+                <div class="dropdown mb-2">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="databaseTypeDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        資料庫類型
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="databaseTypeDropdown">
+                        <a class="dropdown-item" href="#" onclick="setBigQueryTemplate()">BigQuery</a>
+                        <a class="dropdown-item" href="#" onclick="setOtherTemplate()">其他</a>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="jsonInput" class="form-label mt-4">JSON 輸入: (請根據資料庫類型刪改屬性)</label>
+                    <textarea id="jsonInput" class="form-control" rows="8">
+                    </textarea>
+                </div>
+                <div class="mt-3">
+                    <button onclick="convertJSON()" class="btn btn-primary">JSON -> String</button>
+                    <button onclick="reverseConvertJSON()" class="btn btn-primary">String -> JSON</button>
+                    <button onclick="jsonToObject()" class="btn btn-primary">JSON -> Object</button>
+                    <button onclick="jsonStringToObject()" class="btn btn-primary">JSON String -> Object</button>
+
+                </div>
+                <div class="form-group">
+                    <label for="jsonOutput" class="form-label mt-4">轉換結果:</label>
+                    <div class="input-group">
+                        <textarea id="jsonOutput" class="form-control" rows="8" readonly></textarea>
+                        <div class="input-group-append">
+                            <button onclick="copyToClipboard('jsonOutput')" class="btn transparent-button">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 解 Token 頁籤 -->
+            <div id="decodeJwtTab" class="container tab-pane fade"><br>
+                <div class="form-group">
+                    <label for="jwtToken" class="form-label mt-4">JWT Token:</label>
+                    <textarea id="jwtToken" name="jwtToken" class="form-control" rows="8"></textarea>
+                </div>
+                <div class="mt-3">
+                    <button onclick="decodeJwt()" class="btn btn-primary">解 Token</button>
+                </div>
+                <div class="form-group">
+                    <label for="result" class="form-label mt-4">Result:</label>
+                    <div class="input-group">
+                        <textarea id="jwtDecodeResult" name="jwtDecodeResult" class="form-control" rows="8" readonly></textarea>
+                        <div class="input-group-append">
+                            <button onclick="copyToClipboard('jwtDecodeResult')" class="btn transparent-button">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- dm 頁籤 -->
+            <div id="dmTab" class="container tab-pane fade"><br>
+                <div class="form-group">
+                    <label for="dm_data" class="form-label mt-4">dm Data: (若為新增則 dmId 可省略)</label>
+                    <textarea id="dm_data" class="form-control" rows="8">
+{
+    "dmId": "",
+    "dmName": "",
+    "description": "",
+    "connId": "",
+    "dbName": "",
+    "isActivate": true
+}
+                    </textarea>
+                </div>
+                <div class="mt-3">
+                    <button onclick="downloaddmData()" class="btn btn-primary">下載</button>
+                </div>
+        </div>
+    </div>
+    </div>
+    <script>
+        function generateUUID() {
+            const uuid = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+            document.getElementById('uuid').value = uuid;
+        }
+
+
+        // 將 UUID 轉換為 Key
+        function parseUUIDToKey(uuid) {
+            const parseUUID = uuid
+                .replace(/-/g, "")
+                .split("")
+                .reverse()
+                .join("");
+            return CryptoJS.enc.Utf8.parse(parseUUID);
+        }
+
+        function encrypt() {
+            const uuid = document.getElementById('uuid').value;
+            const data = document.getElementById('data').value.trim();
+
+            try {
+                const jsonObj = JSON.parse(data);
+                let jsonString = JSON.stringify(jsonObj);
+                document.getElementById('data').value = jsonString;
+                const encryptedData = encryptData(jsonString, uuid);
+                document.getElementById('result').value = JSON.stringify(encryptedData);
+            } catch (e) {
+                document.getElementById('result').value = "無效的 JSON 格式";
+            }
+        }
+
+        function decrypt() {
+            const uuid = document.getElementById('uuid').value;
+            const data = document.getElementById('data').value;
+            const decryptedData = decryptData(data, uuid);
+            document.getElementById('result').value = JSON.stringify(decryptedData, null, 4);
+        }
+
+        function copyToClipboard(field_id) {
+            const result = document.getElementById(field_id);
+            result.select();
+            document.execCommand('copy');
+        }
+
+        function convertJSON() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            try {
+                const jsonObj = JSON.parse(jsonInput);
+                let jsonString = JSON.stringify(jsonObj);
+
+                // 替換非轉義的雙引號為轉義的雙引號
+                jsonString = jsonString.replace(/(?<!\\)"/g, '\\"');
+
+                document.getElementById('jsonOutput').value = jsonString;
+            } catch (e) {
+                document.getElementById('jsonOutput').value = "無效的 JSON 格式";
+            }
+        }
+
+        function reverseConvertJSON() {
+            const jsonStringInput = document.getElementById('jsonInput').value; // 假設這是 `convertJSON` 函數處理後的輸出
+            try {
+                // 還原轉義的雙引號為非轉義的雙引號
+                let originalString = jsonStringInput.replace(/\\"/g, '"');
+
+                // 解析 JSON 字符串
+                const jsonObj = JSON.parse(originalString);
+
+                // 將解析後的 JSON 對象顯示在輸入框中
+                document.getElementById('jsonOutput').value = JSON.stringify(jsonObj, null, 2);
+            } catch (e) {
+                document.getElementById('jsonOutput').value = "無法轉換回原始 JSON 格式";
+            }
+        }
+
+        function jsonToObject() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            try {
+                const jsonObj = JSON.parse(jsonInput);
+                console.log(jsonObj); // 在控制台輸出對象以驗證轉換
+                document.getElementById('jsonOutput').value = "請查看開發者工具的控制台輸出";
+            } catch (e) {
+                document.getElementById('jsonOutput').value = "無效的 JSON 格式";
+            }
+        }
+
+        function jsonStringToObject() {
+            // 由於 JSON String 轉 Object 本質上與 JSON -> Object 相同，
+            // 此函數可以直接重用 jsonToObject() 的實現
+            jsonToObject();
+        }
+
+        function updateDbType() {
+            const databaseSelect = document.getElementById('database');
+            const dataType = databaseSelect.options[databaseSelect.selectedIndex].value;
+
+            const dataTextArea = document.getElementById('data');
+            try {
+                let dataObj = JSON.parse(dataTextArea.value.trim());
+                dataObj.dbType = dataType;
+                dataTextArea.value = JSON.stringify(dataObj, null, 4);
+            } catch (e) {
+                console.error("Invalid JSON format");
+            }
+        }
+
+        function setOtherTemplate() {
+            const otherJson = {
+                "host": "10.21.1.3",
+                "port": "3306",
+                "username": "test",
+                "password": "test",
+                "database": "testdb"
+            };
+            document.getElementById('jsonInput').value = JSON.stringify(otherJson, null, 4);
+        }
+
+        function downloaddmData() {
+            const data = document.getElementById("dm_data").value;
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const downloadLink = document.createElement("a");
+            downloadLink.href = url;
+            downloadLink.download = "data.json";
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+
+            URL.revokeObjectURL(url);
+        }
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+</body>
+</html>
+

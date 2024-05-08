@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vega-Lite Chart Component Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <style>
+        #view {
+            width: 90vw;
+            height: 90vh;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="view"></div>
+    <script src="chartComponent.js"></script>
+    <script>
+        const width = document.getElementById('view').clientWidth;
+        const height = document.getElementById('view').clientHeight;
+        renderChart('#view', width, height);
+    </script>
+</body>
+
+</html>
